@@ -7,6 +7,9 @@ const app = new EthioSafeguardApp();
 const PORT = parseInt(process.env.PORT || '3000');
 const GRPC_PORT = parseInt(process.env.GRPC_PORT || '50051');
 
+// Export io for use in services (like LocationService)
+export const io = app.io;
+
 // Graceful shutdown handling
 const gracefulShutdown = async (signal: string) => {
   console.log(`\n⚠️  Received ${signal}. Starting graceful shutdown...`);
