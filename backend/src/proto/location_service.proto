@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+package ethiosafeguard;
+
+service LocationService {
+  rpc UpdateLocation(LocationUpdate) returns (LocationResponse);
+  rpc StreamLocations(stream LocationUpdate) returns (stream LocationResponse);
+  rpc HealthCheck(HealthCheckRequest) returns (HealthCheckResponse);
+}
+
+message LocationUpdate {
+  string vehicle_id = 1;
+  double latitude = 2;
+  double longitude = 3;
+  double accuracy = 4;
+  double altitude = 5;
+  double speed = 6;
+  int64 timestamp = 7;
+  string session_id = 8;
+}
+
+message LocationResponse {
+  bool success = 1;
+  string message = 2;
+  string server_time = 3;
+  string server_id = 4;
+}
+
+message HealthCheckRequest {
+  string service = 1;
+}
+
+message HealthCheckResponse {
+  bool healthy = 1;
+  string status = 2;
+  string timestamp = 3;
+}
