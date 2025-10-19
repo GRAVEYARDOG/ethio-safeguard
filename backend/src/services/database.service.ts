@@ -1,5 +1,5 @@
 // src/services/database.service.ts
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '../generated/prisma'; // ← updated import
 
 class DatabaseService {
   private static instance: DatabaseService;
