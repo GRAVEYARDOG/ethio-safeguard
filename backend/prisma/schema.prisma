@@ -9,39 +9,33 @@ datasource db {
 }
 
 model User {
-  id           String   @id @default(uuid())
-  email        String   @unique
-  passwordHash String
-  name         String
-  role         UserRole @default(COORDINATOR)
-  phoneNumber  String?
-  isActive     Boolean  @default(true)
-
-  // Relations
-  assignedVehicles   Vehicle[]
+  id                 String     @id @default(uuid())
+  email              String     @unique
+  passwordHash       String
+  name               String
+  role               UserRole   @default(COORDINATOR)
+  phoneNumber        String?
+  isActive           Boolean    @default(true)
+  createdAt          DateTime   @default(now())
+  updatedAt          DateTime   @updatedAt
   assignedDeliveries Delivery[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  assignedVehicles   Vehicle[]
 
   @@map("users")
 }
 
 model Vehicle {
-  id     String        @id @default(uuid())
-  name   String
-  type   VehicleType
-  status VehicleStatus @default(ACTIVE)
-
-  // Relations
-  currentDriver   User?      @relation(fields: [currentDriverId], references: [id])
+  id              String        @id @default(uuid())
+  name            String
+  type            VehicleType
+  status          VehicleStatus @default(ACTIVE)
   currentDriverId String?
-  locations       Location[]
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  alerts          Alert[]
   deliveries      Delivery[]
-  alerts          Alert[] // back-relation for Alert
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  locations       Location[]
+  currentDriver   User?         @relation(fields: [currentDriverId], references: [id])
 
   @@map("vehicles")
 }
@@ -54,12 +48,9 @@ model Location {
   altitude  Float?
   speed     Float?
   timestamp DateTime
-
-  // Relations
-  vehicle   Vehicle @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
   vehicleId String
-
   createdAt DateTime @default(now())
+  vehicle   Vehicle  @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
 
   @@map("vehicle_locations")
 }
@@ -72,15 +63,12 @@ model Delivery {
   actualArrival      DateTime?
   status             DeliveryStatus @default(PENDING)
   cargoDescription   String?
-
-  // Relations
-  vehicle          Vehicle @relation(fields: [vehicleId], references: [id])
-  vehicleId        String
-  assignedDriver   User?   @relation(fields: [assignedDriverId], references: [id])
-  assignedDriverId String?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  vehicleId          String
+  assignedDriverId   String?
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
+  assignedDriver     User?          @relation(fields: [assignedDriverId], references: [id])
+  vehicle            Vehicle        @relation(fields: [vehicleId], references: [id])
 
   @@map("deliveries")
 }
@@ -91,18 +79,14 @@ model Alert {
   message    String
   severity   AlertSeverity @default(MEDIUM)
   isResolved Boolean       @default(false)
-
-  // Relations
-  vehicle   Vehicle @relation(fields: [vehicleId], references: [id])
-  vehicleId String
-
-  createdAt  DateTime  @default(now())
+  vehicleId  String
+  createdAt  DateTime      @default(now())
   resolvedAt DateTime?
+  vehicle    Vehicle       @relation(fields: [vehicleId], references: [id])
 
   @@map("alerts")
 }
 
-// Enums
 enum UserRole {
   ADMIN
   COORDINATOR

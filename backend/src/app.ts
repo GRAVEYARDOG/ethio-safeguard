@@ -63,12 +63,14 @@ class EthioSafeguardApp {
 
   private initializeErrorHandling(): void {
     // 404 handler
-    this.app.use('*', (req, res) => {
-      res.status(404).json({
-        success: false,
-        message: `Route ${req.originalUrl} not found`
-      });
-    });
+// Option 1: Use Express path regex
+this.app.use((req, res) => {
+  res.status(404).json({
+    success: false,
+    message: `Route ${req.originalUrl} not found`
+  });
+});
+
 
     // Global error handler
     this.app.use((error: any, req: express.Request, res: express.Response, next: express.NextFunction) => {

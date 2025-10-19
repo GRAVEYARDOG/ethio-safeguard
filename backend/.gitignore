@@ -1,3 +1,11 @@
+# Environment variables
 .env
 
+# Prisma generated client
 /src/generated/prisma
+
+# Node modules
+node_modules/
+
+# Logs
+*.log
