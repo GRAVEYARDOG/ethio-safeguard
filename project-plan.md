@@ -7,10 +7,10 @@
 - [x] Basic API structure
 
 ## Phase 2: Core Backend (Week 3-4)
-- [ ] gRPC location service implementation
-- [ ] Database integration with Prisma
-- [ ] Authentication system
-- [ ] Basic vehicle management
+- [x] gRPC location service implementation
+- [x] Database integration with Prisma
+- [x] Authentication system
+- [x] Basic vehicle management
 
 ## Phase 3: Mobile Client (Week 5-6)
 - [ ] Android location tracking service
