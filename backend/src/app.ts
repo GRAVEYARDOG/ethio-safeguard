@@ -7,6 +7,11 @@ import compression from 'compression';
 import { createServer } from 'http';
 import { Server as SocketServer } from 'socket.io';
 
+// Routes must be imported at the top level
+import vehicleRoutes from './routes/vehicle.routes';
+import deliveryRoutes from './routes/delivery.routes';
+import authRoutes from './routes/auth.routes';
+
 class EthioSafeguardApp {
   public app: express.Application;
   public httpServer: any;
@@ -21,7 +26,7 @@ class EthioSafeguardApp {
         methods: ["GET", "POST"]
       }
     });
-    
+
     this.initializeMiddleware();
     this.initializeRoutes();
     this.initializeErrorHandling();
@@ -34,17 +39,16 @@ class EthioSafeguardApp {
       origin: process.env.FRONTEND_URL || "http://localhost:3000",
       credentials: true
     }));
-    
+
     // Performance middleware
     this.app.use(compression());
     this.app.use(morgan('combined'));
-    
+
     // Body parsing middleware
     this.app.use(express.json({ limit: '10mb' }));
     this.app.use(express.urlencoded({ extended: true }));
   }
 
-  // --- UPDATED initializeRoutes METHOD ---
   private initializeRoutes(): void {
     // Health check endpoint
     this.app.get('/health', (req, res) => {
@@ -55,11 +59,6 @@ class EthioSafeguardApp {
         environment: process.env.NODE_ENV
       });
     });
-
-    // Import routes
-    import vehicleRoutes from './routes/vehicle.routes';
-    import deliveryRoutes from './routes/delivery.routes';
-    import authRoutes from './routes/auth.routes';
 
     // API routes
     this.app.use('/api/v1/vehicles', vehicleRoutes);
@@ -93,7 +92,7 @@ class EthioSafeguardApp {
     // Global error handler
     this.app.use((error: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
       console.error('Global error handler:', error);
-      
+
       res.status(error.status || 500).json({
         success: false,
         message: error.message || 'Internal server error',
