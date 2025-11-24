@@ -1,0 +1,149 @@
+// backend/prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String    @id @default(uuid())
+  email        String    @unique
+  passwordHash String
+  name         String
+  role         UserRole  @default(COORDINATOR)
+  phoneNumber  String?
+  isActive     Boolean   @default(true)
+  
+  // Relations
+  assignedVehicles  Vehicle[]
+  assignedDeliveries Delivery[]
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("users")
+}
+
+model Vehicle {
+  id     String @id @default(uuid())
+  name   String
+  type   VehicleType
+  status VehicleStatus @default(ACTIVE)
+  
+  // Relations
+  currentDriver   User?      @relation(fields: [currentDriverId], references: [id])
+  currentDriverId String?
+  locations       Location[]
+  deliveries      Delivery[]
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("vehicles")
+}
+
+model Location {
+  id        String   @id @default(uuid())
+  latitude  Float
+  longitude Float
+  accuracy  Float?
+  altitude  Float?
+  speed     Float?
+  timestamp DateTime
+  
+  // Relations
+  vehicle   Vehicle @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  vehicleId String
+  
+  createdAt DateTime @default(now())
+
+  @@map("vehicle_locations")
+}
+
+model Delivery {
+  id               String   @id @default(uuid())
+  scheduledDeparture DateTime?
+  actualDeparture    DateTime?
+  scheduledArrival   DateTime?
+  actualArrival      DateTime?
+  status           DeliveryStatus @default(PENDING)
+  cargoDescription  String?
+  
+  // Relations
+  vehicle         Vehicle @relation(fields: [vehicleId], references: [id])
+  vehicleId       String
+  assignedDriver  User?   @relation(fields: [assignedDriverId], references: [id])
+  assignedDriverId String?
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("deliveries")
+}
+
+model Alert {
+  id        String   @id @default(uuid())
+  type      AlertType
+  message   String
+  severity  AlertSeverity @default(MEDIUM)
+  isResolved Boolean     @default(false)
+  
+  // Relations
+  vehicle   Vehicle @relation(fields: [vehicleId], references: [id])
+  vehicleId String
+  
+  createdAt DateTime @default(now())
+  resolvedAt DateTime?
+
+  @@map("alerts")
+}
+
+// Enums
+enum UserRole {
+  ADMIN
+  COORDINATOR
+  DRIVER
+}
+
+enum VehicleType {
+  TRUCK
+  AMBULANCE
+  VAN
+  MOTORCYCLE
+}
+
+enum VehicleStatus {
+  ACTIVE
+  INACTIVE
+  MAINTENANCE
+  BREAKDOWN
+}
+
+enum DeliveryStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  DELAYED
+}
+
+enum AlertType {
+  BREAKDOWN
+  DELAY
+  ROUTE_DEVIATION
+  GEO_FENCE_ARRIVAL
+  GEO_FENCE_DEPARTURE
+  EMERGENCY
+  MAINTENANCE_REQUIRED
+}
+
+enum AlertSeverity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
