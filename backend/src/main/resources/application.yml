@@ -1,0 +1,46 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /
+  compression:
+    enabled: true
+
+spring:
+  application:
+    name: ethio-safeguard-backend
+  
+  datasource:
+    url: jdbc:postgresql://localhost:5432/ethio_safeguard
+    username: postgres
+    password: securepass123
+    hikari:
+      maximum-pool-size: 10
+  
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: false
+  
+  redis:
+    host: localhost
+    port: 6379
+    timeout: 5000ms
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+
+server:
+  id: ${SERVER_ID:server-1}
+  role: ${SERVER_ROLE:PRIMARY}
+
+logging:
+  level:
+    com.ethiosafeguard: DEBUG
+  file:
+    name: logs/ethio-safeguard.log
